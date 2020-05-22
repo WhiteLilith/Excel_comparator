@@ -57,17 +57,26 @@ namespace Excel_comparator
             ExcelWorker ew = new ExcelWorker();
             ew.GetFiles(path1, path2);
 
-            List<string> newPeopleList = await ew.NewPeopleAsync();
-            string[] newPeople = newPeopleList.ToArray();
-            listNewPeople.Items.AddRange(newPeople);
+            string[] newPeople = { };
+            string[] missingPeople = { };
 
-            List<string> missingPeopleList = await ew.MissingPeopleAsync();
-            string[] missingPeople = missingPeopleList.ToArray();
-            listMissingPeople.Items.AddRange(missingPeople);
-
-            while(missingPeople.Length != 0 && newPeople.Length != 0 && ew.excelApp_1 != null && ew.excelApp_2 != null)
+            try
             {
-                Thread.Sleep(50);
+                List<string> newPeopleList = await ew.NewPeopleAsync();
+                newPeople = newPeopleList.ToArray();
+                listNewPeople.Items.AddRange(newPeople);
+
+                List<string> missingPeopleList = await ew.MissingPeopleAsync();
+                missingPeople = missingPeopleList.ToArray();
+                listMissingPeople.Items.AddRange(missingPeople);
+            }
+            catch (System.Runtime.InteropServices.COMException)
+            {
+                MessageBox.Show("Произошла неизвестная ошибка. Попробуйте еще раз", "Ошибка");
+                buttonCompare.Enabled = true;
+            }
+            finally 
+            {
                 ew.CloseFiles();
                 Thread.Sleep(50);
                 buttonCompare.Enabled = true;

@@ -64,8 +64,20 @@ namespace Excel_comparator
         {
             workBook_1.Close(false, Type.Missing, Type.Missing);
             workBook_2.Close(false, Type.Missing, Type.Missing);
+
+            excelApp_1.Workbooks.Close();
+            excelApp_2.Workbooks.Close();
+
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(workBook_1);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(workBook_2);
+
             excelApp_1.Quit();
             excelApp_2.Quit();
+
+            GC.Collect();
+
+            System.Runtime.InteropServices.Marshal.FinalReleaseComObject(excelApp_1);
+            System.Runtime.InteropServices.Marshal.FinalReleaseComObject(excelApp_2);
         }
 
         /// <summary>
