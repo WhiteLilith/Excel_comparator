@@ -318,7 +318,7 @@ namespace Excel_comparator
 
         public async Task<List<string>> NewPeopleAsync()
         {
-            return await Task.Run(() => MissingPeople());
+            return await Task.Run(() => NewPeople());
         }
     }
 }
