@@ -248,6 +248,7 @@ namespace Excel_comparator
                     if (firstSheetPeople[i] == secondSheetPeople[j])
                     {
                         exist = true;
+                        break;
                     }
                 }
 
@@ -295,12 +296,13 @@ namespace Excel_comparator
                     if (firstSheetPeople[j] == secondSheetPeople[i])
                     {
                         exist = true;
+                        break;
                     }
                 }
 
                 if (!exist)
                 {
-                    missingPeople.Add(firstSheetPeople[i]);
+                    missingPeople.Add(secondSheetPeople[i]);
                 }
             }
 
