@@ -38,6 +38,9 @@ namespace Excel_comparator
         /// <param name="e"></param>
         private async void button1_Click(object sender, EventArgs e)
         {
+            listNewPeople.Items.Clear();
+            listMissingPeople.Items.Clear();
+
             buttonCompare.Enabled = false;
             string path1 = textFilePath1.Text;
             string path2 = textFilePath2.Text;
@@ -63,10 +66,9 @@ namespace Excel_comparator
             try
             {
                 List<string> newPeopleList = await ew.NewPeopleAsync();
+                List<string> missingPeopleList = await ew.MissingPeopleAsync();
                 newPeople = newPeopleList.ToArray();
                 listNewPeople.Items.AddRange(newPeople);
-
-                List<string> missingPeopleList = await ew.MissingPeopleAsync();
                 missingPeople = missingPeopleList.ToArray();
                 listMissingPeople.Items.AddRange(missingPeople);
             }

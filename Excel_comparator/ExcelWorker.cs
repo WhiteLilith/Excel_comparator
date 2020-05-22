@@ -74,10 +74,14 @@ namespace Excel_comparator
             excelApp_1.Quit();
             excelApp_2.Quit();
 
-            GC.Collect();
+            workSheet_1 = null;
+            workSheet_2 = null;
+            workBook_1 = null;
+            workBook_2 = null;
+            excelApp_1 = null;
+            excelApp_2 = null;
 
-            System.Runtime.InteropServices.Marshal.FinalReleaseComObject(excelApp_1);
-            System.Runtime.InteropServices.Marshal.FinalReleaseComObject(excelApp_2);
+            GC.Collect();
         }
 
         /// <summary>
