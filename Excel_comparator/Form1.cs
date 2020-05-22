@@ -8,13 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace Excel_comparator
 {
     public partial class Form1 : Form
     {
-        private IExcelWorker ew = new ExcelWorker();
-
         public Form1()
         {
             InitializeComponent();
@@ -37,29 +36,42 @@ namespace Excel_comparator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
+            buttonCompare.Enabled = false;
             string path1 = textFilePath1.Text;
             string path2 = textFilePath2.Text;
 
             if (!File.Exists(path1))
             {
                 MessageBox.Show("Задан несуществующий первый файл", "Ошибка");
+                buttonCompare.Enabled = true;
                 return;
             }
             if (!File.Exists(path2))
             {
                 MessageBox.Show("Задан несуществующий второй файл", "Ошибка");
+                buttonCompare.Enabled = true;
                 return;
             }
-
+            ExcelWorker ew = new ExcelWorker();
             ew.GetFiles(path1, path2);
 
-            string[] newPeople = ew.NewPeople().ToArray();
+            List<string> newPeopleList = await ew.NewPeopleAsync();
+            string[] newPeople = newPeopleList.ToArray();
             listNewPeople.Items.AddRange(newPeople);
 
-            string[] missingPeople = ew.MissingPeople().ToArray();
+            List<string> missingPeopleList = await ew.MissingPeopleAsync();
+            string[] missingPeople = missingPeopleList.ToArray();
             listMissingPeople.Items.AddRange(missingPeople);
+
+            while(missingPeople.Length != 0 && newPeople.Length != 0 && ew.excelApp_1 != null && ew.excelApp_2 != null)
+            {
+                Thread.Sleep(50);
+                ew.CloseFiles();
+                Thread.Sleep(50);
+                buttonCompare.Enabled = true;
+            }
         }
 
         /// <summary>

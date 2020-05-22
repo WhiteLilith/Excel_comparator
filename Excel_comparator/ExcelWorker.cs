@@ -6,15 +6,21 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Excel_comparator
 {
+    /*
+     * 
+     * Только я и бог знаем, как это работает 
+     * Через месяц только бог будет знать как он работает
+     * 
+     */
 
     class ExcelWorker : IExcelWorker
     {
 
-        private Microsoft.Office.Interop.Excel.Worksheet workSheet_1;
-        private Microsoft.Office.Interop.Excel.Worksheet workSheet_2;
+        private Excel.Worksheet workSheet_1;
+        private Excel.Worksheet workSheet_2;
 
-        private Excel._Application excelApp_1;
-        private Excel._Application excelApp_2;
+        public Excel._Application excelApp_1;
+        public Excel._Application excelApp_2;
 
         private Excel.Workbook workBook_1;
         private Excel.Workbook workBook_2;
@@ -39,7 +45,6 @@ namespace Excel_comparator
 
             excelApp_2 = new Excel.ApplicationClass();
 
-            // Сделать Excel невидимым (необязательно).
             excelApp_2.Visible = false;
 
             workBook_2 = excelApp_2.Workbooks.Open(
@@ -50,6 +55,17 @@ namespace Excel_comparator
                 Type.Missing, Type.Missing);
 
             workSheet_2 = (Microsoft.Office.Interop.Excel.Worksheet)workBook_2.Sheets[1];
+        }
+
+        /// <summary>
+        /// Закрывает открытые excel файлы
+        /// </summary>
+        public void CloseFiles()
+        {
+            workBook_1.Close(false, Type.Missing, Type.Missing);
+            workBook_2.Close(false, Type.Missing, Type.Missing);
+            excelApp_1.Quit();
+            excelApp_2.Quit();
         }
 
         /// <summary>
@@ -113,16 +129,86 @@ namespace Excel_comparator
         /// <returns></returns>
         private int GetRow(int lengthOfSheet, string rowName, Excel.Worksheet workSheet)
         {
+            Excel.Range xlRange = workSheet.UsedRange;
+
             int num = 0;
             for (int i = 1; i < lengthOfSheet + 1; i++)
             {
-                if (workSheet.Cells[1, i].ToString().ToLower() == rowName)
+                if (((Excel.Range)xlRange.Cells[1, i]).Value2 != null && ((Excel.Range)xlRange.Cells[1, i]).Value2.ToString().ToLower() == rowName.ToLower())
                 {
                     num = i;
                     break;
                 }
             }
             return num;
+        }
+
+        /// <summary>
+        /// заполняет список людей по их ФИО
+        /// </summary>
+        /// <param name="listPeople"></param>
+        /// <param name="workSheet"></param>
+        /// <param name="lastRow"></param>
+        /// <param name="surenameNum"></param>
+        /// <param name="nameNum"></param>
+        /// <param name="patronymicNum"></param>
+        private void FillSNPList(ref List<Human> listPeople, Excel.Worksheet workSheet, int lastRow, int surenameNum, int nameNum, int patronymicNum)
+        {
+            string surename = "";
+            string name = "";
+            string patronymic = "";
+
+            Excel.Range xlRange = workSheet.UsedRange;
+
+            for (int i = 2; i < lastRow + 1; i++)
+            {
+                surename = "";
+                name = "";
+                patronymic = "";
+                try
+                {
+                    surename = ((Excel.Range)xlRange.Cells[i, surenameNum]).Value2.ToString().ToLower();
+                    name = ((Excel.Range)xlRange.Cells[i, nameNum]).Value2.ToString().ToLower();
+                    patronymic = ((Excel.Range)xlRange.Cells[i, patronymicNum]).Value2.ToString().ToLower();
+                }
+                catch (System.NullReferenceException)
+                {
+
+                }
+
+                if (name != "" && surename != "")
+                {
+                    Human currentHuman = new Human(name, surename, patronymic);
+                    listPeople.Add(currentHuman);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// заполняет списки людей из двух книг
+        /// </summary>
+        /// <param name="firstList"></param>
+        /// <param name="secondList"></param>
+        private void FillListsOfPeople(ref List<Human> firstList, ref List<Human> secondList, int lastRow_1, int lastRow_2)
+        {
+            int lengthOfFirst = GetLastColumn(workSheet_1);
+            int lengthOfSecond = GetLastColumn(workSheet_2);
+
+            int firstSurenameNumber = GetRow(lengthOfFirst, "фамилия", workSheet_1);
+            int firstNameNumber = GetRow(lengthOfFirst, "имя", workSheet_1);
+            int firstPatronymicNumber = GetRow(lengthOfFirst, "отчество", workSheet_1);
+
+            int secondSurenameNumber = GetRow(lengthOfSecond, "фамилия", workSheet_2);
+            int secondNameNumber = GetRow(lengthOfSecond, "имя", workSheet_2);
+            int secondPatronymicNumber = GetRow(lengthOfSecond, "отчество", workSheet_2);
+
+            FillSNPList(ref firstList, workSheet_1, lastRow_1, firstSurenameNumber, firstNameNumber, firstPatronymicNumber);
+
+            FillSNPList(ref secondList, workSheet_2, lastRow_2, secondSurenameNumber, secondNameNumber, secondPatronymicNumber);
         }
 
         public List<string> MissingPeople()
@@ -133,44 +219,15 @@ namespace Excel_comparator
             int lastRow_1 = GetLastRow(workSheet_1);
             int lastRow_2 = GetLastRow(workSheet_2);
 
-            int lengthOfFirst = GetLastColumn(workSheet_2);
-            int lengthOfSecond = GetLastColumn(workSheet_2);
-
-
-            int firstSurenameNumber = GetRow(lengthOfFirst, "фамилия", workSheet_1);
-            int firstNameNumber = GetRow(lengthOfFirst, "имя", workSheet_1);
-            int firstPatronymicNumber = GetRow(lengthOfFirst, "отчество", workSheet_1);
-
-            int secondSurenameNumber = GetRow(lengthOfSecond, "фамилия", workSheet_2);
-            int secondNameNumber = GetRow(lengthOfSecond, "имя", workSheet_2);
-            int secondPatronymicNumber = GetRow(lengthOfSecond, "отчество", workSheet_2);
-
-
-            for (int i = 2; i < lastRow_1 + 1; i++)
-            {
-                string surename = workSheet_1.Cells[i, firstSurenameNumber].ToString();
-                string name = workSheet_1.Cells[i, firstNameNumber].ToString();
-                string patronymic = workSheet_1.Cells[i, firstPatronymicNumber].ToString();
-                Human currentHuman = new Human(name, surename, patronymic);
-                firstSheetPeople.Add(currentHuman);
-            }
-
-            for (int i = 2; i < lastRow_2 + 1; i++)
-            {
-                string surename = workSheet_2.Cells[i, secondSurenameNumber].ToString();
-                string name = workSheet_2.Cells[i, secondNameNumber].ToString();
-                string patronymic = workSheet_2.Cells[i, secondPatronymicNumber].ToString();
-                Human currentHuman = new Human(name, surename, patronymic);
-                secondSheetPeople.Add(currentHuman);
-            }
+            FillListsOfPeople(ref firstSheetPeople, ref secondSheetPeople, lastRow_1, lastRow_2);
 
             List<Human> missingPeople = new List<Human>();
 
             bool exist = false;
-            for (int i = 0; i < lastRow_1; i++)
+            for (int i = 0; i < firstSheetPeople.Count; i++)
             {
                 exist = false;
-                for (int j = 0; j < lastRow_2; j++)
+                for (int j = 0; j < secondSheetPeople.Count; j++)
                 {
                     if (firstSheetPeople[i] == secondSheetPeople[j])
                     {
@@ -196,6 +253,11 @@ namespace Excel_comparator
             return returnListOfPeople;
         }
 
+        public async Task<List<string>> MissingPeopleAsync()
+        {
+            return await Task.Run(() => MissingPeople());
+        }
+
         public List<string> NewPeople()
         {
             List<Human> firstSheetPeople = new List<Human>();
@@ -204,46 +266,17 @@ namespace Excel_comparator
             int lastRow_1 = GetLastRow(workSheet_1);
             int lastRow_2 = GetLastRow(workSheet_2);
 
-            int lengthOfFirst = GetLastColumn(workSheet_2);
-            int lengthOfSecond = GetLastColumn(workSheet_2);
-
-
-            int firstSurenameNumber = GetRow(lengthOfFirst, "фамилия", workSheet_1);
-            int firstNameNumber = GetRow(lengthOfFirst, "имя", workSheet_1);
-            int firstPatronymicNumber = GetRow(lengthOfFirst, "отчество", workSheet_1);
-
-            int secondSurenameNumber = GetRow(lengthOfSecond, "фамилия", workSheet_2);
-            int secondNameNumber = GetRow(lengthOfSecond, "имя", workSheet_2);
-            int secondPatronymicNumber = GetRow(lengthOfSecond, "отчество", workSheet_2);
-
-
-            for (int i = 2; i < lastRow_1 + 1; i++)
-            {
-                string surename = workSheet_1.Cells[i, firstSurenameNumber].ToString();
-                string name = workSheet_1.Cells[i, firstNameNumber].ToString();
-                string patronymic = workSheet_1.Cells[i, firstPatronymicNumber].ToString();
-                Human currentHuman = new Human(name, surename, patronymic);
-                firstSheetPeople.Add(currentHuman);
-            }
-
-            for (int i = 2; i < lastRow_2 + 1; i++)
-            {
-                string surename = workSheet_2.Cells[i, secondSurenameNumber].ToString();
-                string name = workSheet_2.Cells[i, secondNameNumber].ToString();
-                string patronymic = workSheet_2.Cells[i, secondPatronymicNumber].ToString();
-                Human currentHuman = new Human(name, surename, patronymic);
-                secondSheetPeople.Add(currentHuman);
-            }
+            FillListsOfPeople(ref firstSheetPeople, ref secondSheetPeople, lastRow_1, lastRow_2);
 
             List<Human> missingPeople = new List<Human>();
 
             bool exist = false;
-            for (int i = 0; i < lastRow_2; i++)
+            for (int i = 0; i < secondSheetPeople.Count; i++)
             {
                 exist = false;
-                for (int j = 0; j < lastRow_1; j++)
+                for (int j = 0; j < firstSheetPeople.Count; j++)
                 {
-                    if (firstSheetPeople[i] == secondSheetPeople[j])
+                    if (firstSheetPeople[j] == secondSheetPeople[i])
                     {
                         exist = true;
                     }
@@ -265,6 +298,11 @@ namespace Excel_comparator
             }
 
             return returnListOfPeople;
+        }
+
+        public async Task<List<string>> NewPeopleAsync()
+        {
+            return await Task.Run(() => MissingPeople());
         }
     }
 }
