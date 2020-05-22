@@ -13,6 +13,8 @@ namespace Excel_comparator
 {
     public partial class Form1 : Form
     {
+        private IExcelWorker ew = new ExcelWorker();
+
         public Form1()
         {
             InitializeComponent();
@@ -23,7 +25,7 @@ namespace Excel_comparator
             OpenFileDialog ofd = new OpenFileDialog();
 
             ofd.Title = "Выберете файл";
-            ofd.Filter = "excel файл (*.xlsx)| *.xlsx";
+            ofd.Filter = "excel файл (*.xlsx, *.xls)| *.xlsx; *.xls";
 
             ofd.ShowDialog();
 
@@ -50,6 +52,14 @@ namespace Excel_comparator
                 MessageBox.Show("Задан несуществующий второй файл", "Ошибка");
                 return;
             }
+
+            ew.GetFiles(path1, path2);
+
+            string[] newPeople = ew.NewPeople().ToArray();
+            listNewPeople.Items.AddRange(newPeople);
+
+            string[] missingPeople = ew.MissingPeople().ToArray();
+            listMissingPeople.Items.AddRange(missingPeople);
         }
 
         /// <summary>
