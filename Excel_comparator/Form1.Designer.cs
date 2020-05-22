@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.ChooseFile1 = new System.Windows.Forms.Button();
             this.textFilePath1 = new System.Windows.Forms.TextBox();
             this.ChooseFile2 = new System.Windows.Forms.Button();
@@ -178,8 +179,10 @@
             this.Controls.Add(this.labelNewPeople);
             this.Controls.Add(this.buttonCompare);
             this.Controls.Add(this.groupBox2);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Excel comparator v0.0.1 pre-alpha realease";
+            this.Text = "Excel comparator v0.0.1337.322 pre-alpha release";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
