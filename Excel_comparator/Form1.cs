@@ -87,6 +87,11 @@ namespace Excel_comparator
             }
             catch (System.Runtime.InteropServices.COMException)
             {
+                MessageBox.Show("Произошла ошибка чтения данных из файла. Попробуйте еще раз", "Ошибка");
+                buttonCompare.Enabled = true;
+            }
+            catch(Exception)
+            {
                 MessageBox.Show("Произошла неизвестная ошибка. Попробуйте еще раз", "Ошибка");
                 buttonCompare.Enabled = true;
             }
