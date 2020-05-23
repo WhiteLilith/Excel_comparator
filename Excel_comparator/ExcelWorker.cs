@@ -188,7 +188,7 @@ namespace Excel_comparator
             int num = 0;
             for (int i = 1; i < lengthOfSheet + 1; i++)
             {
-                if (((Excel.Range)xlRange.Cells[1, i]).Value2 != null && ((Excel.Range)xlRange.Cells[1, i]).Value2.ToString().ToLower() == rowName.ToLower())
+                if (((Excel.Range)xlRange.Cells[1, i]).Value2 != null && ((Excel.Range)xlRange.Cells[1, i]).Value2.ToString().ToLower().Replace(" ", "") == rowName.ToLower())
                 {
                     num = i;
                     break;

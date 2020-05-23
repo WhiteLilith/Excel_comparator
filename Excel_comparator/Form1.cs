@@ -67,8 +67,10 @@ namespace Excel_comparator
             {
                 List<string> newPeopleList = await ew.NewPeopleAsync();
                 List<string> missingPeopleList = await ew.MissingPeopleAsync();
+
                 newPeople = newPeopleList.ToArray();
                 listNewPeople.Items.AddRange(newPeople);
+
                 missingPeople = missingPeopleList.ToArray();
                 listMissingPeople.Items.AddRange(missingPeople);
             }
