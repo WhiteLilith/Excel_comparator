@@ -143,6 +143,7 @@ namespace Excel_comparator
         private int GetLastColumn(Excel.Worksheet workSheet)
         {
             int lastRow = 0;
+
             while (true) 
             {
                 try

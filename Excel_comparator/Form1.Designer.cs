@@ -42,6 +42,7 @@
             this.listMissingPeople = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -82,7 +83,7 @@
             // 
             // buttonCompare
             // 
-            this.buttonCompare.Location = new System.Drawing.Point(161, 160);
+            this.buttonCompare.Location = new System.Drawing.Point(19, 160);
             this.buttonCompare.Name = "buttonCompare";
             this.buttonCompare.Size = new System.Drawing.Size(146, 23);
             this.buttonCompare.TabIndex = 4;
@@ -93,11 +94,12 @@
             // labelNewPeople
             // 
             this.labelNewPeople.AutoSize = true;
-            this.labelNewPeople.Location = new System.Drawing.Point(12, 222);
+            this.labelNewPeople.Location = new System.Drawing.Point(16, 219);
             this.labelNewPeople.Name = "labelNewPeople";
             this.labelNewPeople.Size = new System.Drawing.Size(123, 13);
             this.labelNewPeople.TabIndex = 7;
             this.labelNewPeople.Text = "Новые люди в файле 2";
+            this.labelNewPeople.Click += new System.EventHandler(this.labelNewPeople_Click);
             // 
             // labelMissingPeople
             // 
@@ -164,11 +166,22 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "groupBox2";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(171, 160);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(332, 39);
+            this.label1.TabIndex = 15;
+            this.label1.Text = "Все открывающиеся во время работы программы \nдиалоговые окна экселя должны закрываться вручную," +
+                                " \nиначе программа не сможет считать данные с листа \nи не сможет завершить свою работу";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(481, 450);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.textFilePath2);
             this.Controls.Add(this.ChooseFile2);
             this.Controls.Add(this.textFilePath1);
@@ -207,6 +220,7 @@
         private System.Windows.Forms.ListBox listMissingPeople;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label label1;
     }
 }
 

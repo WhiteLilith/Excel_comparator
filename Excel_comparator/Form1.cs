@@ -112,5 +112,10 @@ namespace Excel_comparator
         {
 
         }
+
+        private void labelNewPeople_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
