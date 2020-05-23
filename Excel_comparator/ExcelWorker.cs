@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -57,31 +59,55 @@ namespace Excel_comparator
             workSheet_2 = (Microsoft.Office.Interop.Excel.Worksheet)workBook_2.Sheets[1];
         }
 
+        [DllImport("user32.dll")]
+        static extern int GetWindowThreadProcessId(int hWnd, out int lpdwProcessId);
+
+        static Process GetExcelProcess(Excel._Application excelApp)
+        {
+            GetWindowThreadProcessId(excelApp.Hwnd, out int id);
+            return Process.GetProcessById(id);
+        }
+
         /// <summary>
         /// Закрывает открытые excel файлы
         /// </summary>
         public void CloseFiles()
         {
-            workBook_1.Close(false, Type.Missing, Type.Missing);
-            workBook_2.Close(false, Type.Missing, Type.Missing);
+            try
+            {
+                workBook_1.Close(false, Type.Missing, Type.Missing);
+                workBook_2.Close(false, Type.Missing, Type.Missing);
 
-            excelApp_1.Workbooks.Close();
-            excelApp_2.Workbooks.Close();
+                excelApp_1.Workbooks.Close();
+                excelApp_2.Workbooks.Close();
 
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(workBook_1);
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(workBook_2);
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(workBook_1);
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(workBook_2);
 
-            excelApp_1.Quit();
-            excelApp_2.Quit();
+                excelApp_1.Quit();
+                excelApp_2.Quit();
+            }
+            catch(Exception)
+            {
 
-            workSheet_1 = null;
-            workSheet_2 = null;
-            workBook_1 = null;
-            workBook_2 = null;
-            excelApp_1 = null;
-            excelApp_2 = null;
+            }
+            finally
+            {
+                Process app_proc1 = GetExcelProcess(excelApp_1);
+                Process app_proc2 = GetExcelProcess(excelApp_2);
 
-            GC.Collect();
+                app_proc1.Kill();
+                app_proc2.Kill();
+
+                workSheet_1 = null;
+                workSheet_2 = null;
+                workBook_1 = null;
+                workBook_2 = null;
+                excelApp_1 = null;
+                excelApp_2 = null;
+
+                GC.Collect();
+            }
         }
 
         /// <summary>
@@ -117,9 +143,8 @@ namespace Excel_comparator
         /// <returns></returns>
         private int GetLastColumn(Excel.Worksheet workSheet)
         {
-            int counter = 0;
             int lastRow = 0;
-            while (counter < 2500) 
+            while (true) 
             {
                 try
                 {
@@ -129,7 +154,7 @@ namespace Excel_comparator
                 }
                 catch (System.Runtime.InteropServices.COMException)
                 {
-                    counter++;
+                    
                 }
             }
 
@@ -145,7 +170,20 @@ namespace Excel_comparator
         /// <returns></returns>
         private int GetRow(int lengthOfSheet, string rowName, Excel.Worksheet workSheet)
         {
-            Excel.Range xlRange = workSheet.UsedRange;
+            Excel.Range xlRange = null;
+            bool isSuccess = false;
+            while(isSuccess != true)
+            {
+                try
+                {
+                    xlRange = workSheet.UsedRange;
+                    isSuccess = true;
+                }
+                catch (System.Runtime.InteropServices.COMException)
+                {
+                    Thread.Sleep(50);
+                }
+            }
 
             int num = 0;
             for (int i = 1; i < lengthOfSheet + 1; i++)
