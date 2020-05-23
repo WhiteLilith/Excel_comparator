@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Globalization;
 
 namespace Excel_comparator
 {
@@ -68,10 +69,20 @@ namespace Excel_comparator
                 List<string> newPeopleList = await ew.NewPeopleAsync();
                 List<string> missingPeopleList = await ew.MissingPeopleAsync();
 
+                var textInfo = new CultureInfo("ru-RU").TextInfo;
+
                 newPeople = newPeopleList.ToArray();
+                for(int i = 0; i < newPeople.Length; i++)
+                {
+                    newPeople[i] = textInfo.ToTitleCase(newPeople[i]);
+                }
                 listNewPeople.Items.AddRange(newPeople);
 
                 missingPeople = missingPeopleList.ToArray();
+                for (int i = 0; i < missingPeople.Length; i++)
+                {
+                    missingPeople[i] = textInfo.ToTitleCase(missingPeople[i]);
+                }
                 listMissingPeople.Items.AddRange(missingPeople);
             }
             catch (System.Runtime.InteropServices.COMException)
