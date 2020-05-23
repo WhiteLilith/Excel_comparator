@@ -117,9 +117,8 @@ namespace Excel_comparator
         /// <returns></returns>
         private int GetLastRow(Excel.Worksheet workSheet)
         {
-            int counter = 0;
             int lastRow = 0;
-            while (counter < 2500) //таки костыль
+            while (true) //таки костыль
             {
                 try
                 {
@@ -129,7 +128,7 @@ namespace Excel_comparator
                 }
                 catch (System.Runtime.InteropServices.COMException)
                 {
-                    counter++;
+
                 }
             }
 
